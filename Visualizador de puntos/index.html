@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Visualizador de puntos</title>
+    <meta name="viewport" content="initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta charset="utf-8">
+    <style>
+        html,
+        body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+
+        #map {
+            height: 100%;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="map"></div>
+    <script>
+        var map;
+        var principalPolygon;
+
+        function initMap() {
+
+            map = new google.maps.Map(document.getElementById('map'), {
+                zoom: 5,
+                center: {
+                    lat: -34.654744,
+                    lng: -58.555602
+                },
+                mapTypeId: google.maps.MapTypeId.TERRAIN
+            });
+
+            setMarkers();
+
+        }
+
+        function setMarkers() {
+
+            var vec = JSON.parse(getParameterByName("p"));
+            vec = toCamel(vec);
+            vec.forEach(function (latLng) {
+
+                var position = new google.maps.LatLng(latLng.la, latLng.lo);
+
+                var marker = new google.maps.Marker({
+                    position: position,
+                    title: ""
+                });
+
+                marker.setMap(map);
+            });
+        }
+
+        function getParameterByName(name, url) {
+
+            if (!url) {
+                url = window.location.href;
+            }
+            name = name.replace(/[\[\]]/g, "\\$&");
+            var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
+                results = regex.exec(url);
+            if (!results) return null;
+            if (!results[2]) return '';
+            return decodeURIComponent(results[2].replace(/\+/g, " "));
+
+        }
+
+        function toCamel(o) {
+            var newO, origKey, newKey, value
+            if (o instanceof Array) {
+                newO = []
+                for (origKey in o) {
+                    value = o[origKey]
+                    if (typeof value === "object") {
+                        value = toCamel(value)
+                    }
+                    newO.push(value)
+                }
+            } else {
+                newO = {}
+                for (origKey in o) {
+                    if (o.hasOwnProperty(origKey)) {
+                        newKey = (origKey.charAt(0).toLowerCase() + origKey.slice(1) || origKey).toString()
+                        value = o[origKey]
+                        if (value !== null && value.constructor === Object) {
+                            value = toCamel(value)
+                        }
+                        newO[newKey] = value
+                    }
+                }
+            }
+            return newO
+        }
+    </script>
+
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCgGOZyoyPNYnpqnmUR4NbLsRDowF-sYG8&callback=initMap" async
+        defer></script>
+
+</body>
+
+</html>

@@ -1,0 +1,11 @@
+C:\Users\Maxo\Desktop\Paramedic\Mapas\WebBrowser\Paramedic.Mapas.WebBrowser\Paramedic.Mapas.WebBrowser\bin\Debug\Paramedic.Mapas.WebBrowser.exe.config
+C:\Users\Maxo\Desktop\Paramedic\Mapas\WebBrowser\Paramedic.Mapas.WebBrowser\Paramedic.Mapas.WebBrowser\bin\Debug\Paramedic.Mapas.WebBrowser.exe
+C:\Users\Maxo\Desktop\Paramedic\Mapas\WebBrowser\Paramedic.Mapas.WebBrowser\Paramedic.Mapas.WebBrowser\bin\Debug\Paramedic.Mapas.WebBrowser.pdb
+C:\Users\Maxo\Desktop\Paramedic\Mapas\WebBrowser\Paramedic.Mapas.WebBrowser\Paramedic.Mapas.WebBrowser\obj\Debug\Paramedic.Mapas.WebBrowser.csprojResolveAssemblyReference.cache
+C:\Users\Maxo\Desktop\Paramedic\Mapas\WebBrowser\Paramedic.Mapas.WebBrowser\Paramedic.Mapas.WebBrowser\obj\Debug\Paramedic.Mapas.WebBrowser.Form1.resources
+C:\Users\Maxo\Desktop\Paramedic\Mapas\WebBrowser\Paramedic.Mapas.WebBrowser\Paramedic.Mapas.WebBrowser\obj\Debug\Paramedic.Mapas.WebBrowser.Properties.Resources.resources
+C:\Users\Maxo\Desktop\Paramedic\Mapas\WebBrowser\Paramedic.Mapas.WebBrowser\Paramedic.Mapas.WebBrowser\obj\Debug\Paramedic.Mapas.WebBrowser.csproj.GenerateResource.Cache
+C:\Users\Maxo\Desktop\Paramedic\Mapas\WebBrowser\Paramedic.Mapas.WebBrowser\Paramedic.Mapas.WebBrowser\obj\Debug\Paramedic.Mapas.WebBrowser.exe
+C:\Users\Maxo\Desktop\Paramedic\Mapas\WebBrowser\Paramedic.Mapas.WebBrowser\Paramedic.Mapas.WebBrowser\obj\Debug\Paramedic.Mapas.WebBrowser.pdb
+C:\Users\Maxo\Desktop\Paramedic\Mapas\WebBrowser\Paramedic.Mapas.WebBrowser\Paramedic.Mapas.WebBrowser\bin\Debug\Newtonsoft.Json.dll
+C:\Users\Maxo\Desktop\Paramedic\Mapas\WebBrowser\Paramedic.Mapas.WebBrowser\Paramedic.Mapas.WebBrowser\bin\Debug\Newtonsoft.Json.xml
