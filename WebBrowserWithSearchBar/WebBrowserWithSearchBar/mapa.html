@@ -1,0 +1,182 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+	<title>Simple Map</title>
+	<meta name="viewport" content="initial-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta charset="utf-8">
+	<style>
+		html, body {
+			height: 100%;
+			margin: 0;
+			padding: 0;
+		}
+
+		#map {
+			height: 100%;
+		}
+
+		.controls {
+			margin-top: 10px;
+			border: 1px solid transparent;
+			border-radius: 2px 0 0 2px;
+			box-sizing: border-box;
+			-moz-box-sizing: border-box;
+			height: 32px;
+			outline: none;
+			box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+		}
+
+		#pac-input {
+			background-color: #fff;
+			font-family: Roboto;
+			font-size: 15px;
+			font-weight: 300;
+			margin-left: 12px;
+			padding: 0 11px 0 13px;
+			text-overflow: ellipsis;
+			width: 300px;
+		}
+
+			#pac-input:focus {
+				border-color: #4d90fe;
+			}
+
+		.pac-container {
+			font-family: Roboto;
+		}
+
+		#type-selector {
+			color: #fff;
+			background-color: #4d90fe;
+			padding: 5px 11px 0px 11px;
+		}
+
+			#type-selector label {
+				font-family: Roboto;
+				font-size: 13px;
+				font-weight: 300;
+			}
+
+		#target {
+			width: 345px;
+		}
+	</style>
+</head>
+<body>
+	<input id="pac-input" class="controls" type="text" placeholder="Ingrese su dirección...">
+	<div id="map"></div>
+	<script>
+
+		var map, infowindow;
+		var markers = [];
+		
+		function initMap() {
+			map = new google.maps.Map(document.getElementById('map'), {
+				zoom: 5,
+				center: { lat: -34.654744, lng: -58.555602 },
+				mapTypeId: google.maps.MapTypeId.TERRAIN
+			});
+			
+			infowindow = new google.maps.InfoWindow();
+			var input = document.getElementById('pac-input');
+			var searchBox = new google.maps.places.SearchBox(input);
+			
+			map.controls[google.maps.ControlPosition.TOP_LEFT].push(input);
+
+			map.addListener('bounds_changed', function () {
+				searchBox.setBounds(map.getBounds());
+			});
+
+			searchBox.addListener('places_changed', function () {
+				var places = searchBox.getPlaces();
+
+				if (places.length == 0) {
+					return;
+				}
+
+				markers.forEach(function (marker) {
+					marker.setMap(null);
+				});
+				markers = [];
+
+				var bounds = new google.maps.LatLngBounds();
+				places.forEach(function (place) {
+					if (!place.geometry) {
+						console.log("Returned place contains no geometry");
+						return;
+					}
+					var icon = {
+						url: place.icon,
+						size: new google.maps.Size(71, 71),
+						origin: new google.maps.Point(0, 0),
+						anchor: new google.maps.Point(17, 34),
+						scaledSize: new google.maps.Size(25, 25)
+					};
+
+					var marker = new google.maps.Marker({
+						map: map,
+						icon: icon,
+						title: place.name,
+						position: place.geometry.location,
+						address: place.formatted_address
+					});
+					
+					google.maps.event.addListener(marker, 'click', function() {
+						setInfoContent(place);
+						infowindow.open(map, this);
+					});					
+					
+					markers.push(marker);
+
+					if (place.geometry.viewport) {
+						bounds.union(place.geometry.viewport);
+					} else {
+						bounds.extend(place.geometry.location);
+					}
+				});
+				
+				if (markers.length === 1) {
+					setInfoContent(places[0]);
+					infowindow.open(map, markers[0]);
+				}
+					
+				map.fitBounds(bounds);
+			});
+		}
+		
+		function setInfoContent(place) {		
+			infowindow.setContent('<div><strong>' + place.name + '</strong><br>' + place.formatted_address + '</div>');			
+		}
+
+		function saveLocation() {
+
+			if (markers.length == 0) {
+				alert('Debe seleccionar un punto en el mapa');
+				return;
+			}
+
+			if (markers.length > 1) {
+				alert('Debe seleccionar solamente un punto en el mapa');
+				return;
+			}
+			
+			var m = markers[0];
+			
+			var ref = {
+				lat: m.position.lat(),
+				lng: m.position.lng(),
+				address: m.address,
+				name: m.title
+			};
+			
+			return JSON.stringify(ref);		
+		}
+
+	</script>
+	<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCgGOZyoyPNYnpqnmUR4NbLsRDowF-sYG8&libraries=places&callback=initMap"
+			async defer>
+	</script>
+
+</body>
+</html>
