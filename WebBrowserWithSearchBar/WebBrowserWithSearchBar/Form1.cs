@@ -5,16 +5,12 @@ using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace WebBrowserWithSearchBar
 {
 	public partial class Form1 : Form
 	{
-
 		#region Properties
 
 		public string _MapPath { get; set; }
@@ -38,8 +34,6 @@ namespace WebBrowserWithSearchBar
 			this.webBrowser.Navigate(_MapPath);
 		}
 
-		#endregion
-
 		private void btnSave_Click(object sender, EventArgs e)
 		{
 			try
@@ -57,5 +51,7 @@ namespace WebBrowserWithSearchBar
 				var ex = exception;
 			}
 		}
+
+		#endregion
 	}
 }
