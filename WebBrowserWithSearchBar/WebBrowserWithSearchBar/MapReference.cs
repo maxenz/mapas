@@ -14,8 +14,6 @@ namespace WebBrowserWithSearchBar
 
 		public double Lng { get; set; }
 
-		public string Name { get; set; }
-
 		public string Address { get; set; }
 
 		#endregion

@@ -68,20 +68,19 @@
 	<div id="map"></div>
 	<script>
 
-		var map, infowindow;
-		var markers = [];
-		
+		var map, infowindow, marker;
+		var input = document.getElementById('pac-input');
+
 		function initMap() {
 			map = new google.maps.Map(document.getElementById('map'), {
 				zoom: 5,
 				center: { lat: -34.654744, lng: -58.555602 },
 				mapTypeId: google.maps.MapTypeId.TERRAIN
 			});
-			
+
 			infowindow = new google.maps.InfoWindow();
-			var input = document.getElementById('pac-input');
 			var searchBox = new google.maps.places.SearchBox(input);
-			
+
 			map.controls[google.maps.ControlPosition.TOP_LEFT].push(input);
 
 			map.addListener('bounds_changed', function () {
@@ -91,14 +90,17 @@
 			searchBox.addListener('places_changed', function () {
 				var places = searchBox.getPlaces();
 
-				if (places.length == 0) {
+				if (places.length === 0) {
 					return;
 				}
 
-				markers.forEach(function (marker) {
+				if (places.length > 1) {
+					alert('Debe seleccionar un lugar mas específico.');
+				}
+
+				if (marker) {
 					marker.setMap(null);
-				});
-				markers = [];
+				}
 
 				var bounds = new google.maps.LatLngBounds();
 				places.forEach(function (place) {
@@ -106,28 +108,29 @@
 						console.log("Returned place contains no geometry");
 						return;
 					}
-					var icon = {
-						url: place.icon,
-						size: new google.maps.Size(71, 71),
-						origin: new google.maps.Point(0, 0),
-						anchor: new google.maps.Point(17, 34),
-						scaledSize: new google.maps.Size(25, 25)
-					};
 
-					var marker = new google.maps.Marker({
+					marker = new google.maps.Marker({
 						map: map,
-						icon: icon,
-						title: place.name,
+						draggable: true,
+						animation: google.maps.Animation.DROP,
 						position: place.geometry.location,
 						address: place.formatted_address
 					});
-					
-					google.maps.event.addListener(marker, 'click', function() {
-						setInfoContent(place);
+
+					google.maps.event.addListener(marker, 'mouseover', function () {
+						setInfoContent();
 						infowindow.open(map, this);
-					});					
-					
-					markers.push(marker);
+					});
+
+					google.maps.event.addListener(marker, 'mouseout', function () {
+						infowindow.close();
+					});
+
+					google.maps.event.addListener(marker, 'dragend', function () {
+						infowindow.close();
+						updateMarkerPosition();
+						infowindow.open(map, this);
+					});
 
 					if (place.geometry.viewport) {
 						bounds.union(place.geometry.viewport);
@@ -135,42 +138,44 @@
 						bounds.extend(place.geometry.location);
 					}
 				});
-				
-				if (markers.length === 1) {
-					setInfoContent(places[0]);
-					infowindow.open(map, markers[0]);
-				}
-					
 				map.fitBounds(bounds);
 			});
 		}
-		
-		function setInfoContent(place) {		
-			infowindow.setContent('<div><strong>' + place.name + '</strong><br>' + place.formatted_address + '</div>');			
+
+		function setInfoContent() {
+			infowindow.setContent('<div><strong>' + marker.address + '</strong></div>');
 		}
 
 		function saveLocation() {
 
-			if (markers.length == 0) {
+			if (!marker) {
 				alert('Debe seleccionar un punto en el mapa');
 				return;
 			}
 
-			if (markers.length > 1) {
-				alert('Debe seleccionar solamente un punto en el mapa');
-				return;
-			}
-			
-			var m = markers[0];
-			
 			var ref = {
-				lat: m.position.lat(),
-				lng: m.position.lng(),
-				address: m.address,
-				name: m.title
+				lat: marker.position.lat(),
+				lng: marker.position.lng(),
+				address: marker.address
 			};
-			
-			return JSON.stringify(ref);		
+
+			return JSON.stringify(ref);
+		}
+
+		function updateMarkerPosition() {
+			var geocoder = new google.maps.Geocoder();
+			geocoder.geocode({
+				latLng: marker.getPosition()
+			}, function (results, status) {
+				if (status === google.maps.GeocoderStatus.OK) {
+					var updatedPlace = results[0];
+					input.value = updatedPlace.formatted_address;
+					marker.name = updatedPlace.name;
+					marker.address = updatedPlace.formatted_address;
+					setInfoContent();
+				}
+			});
+
 		}
 
 	</script>

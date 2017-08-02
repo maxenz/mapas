@@ -40,10 +40,9 @@ namespace WebBrowserWithSearchBar
 			{
 				dynamic direction = this.webBrowser.Document.InvokeScript("saveLocation");
 				MapReference reference = JsonConvert.DeserializeObject<MapReference>(direction);
-				MessageBox.Show(string.Format("Latitud: {0}, Longitud: {1}, Nombre: {2}, Dirección: {3}",
+				MessageBox.Show(string.Format("Latitud: {0}, Longitud: {1}, Dirección: {2}",
 					reference.Lat,
 					reference.Lng,
-					reference.Name,
 					reference.Address));
 			}
 			catch (Exception exception)
