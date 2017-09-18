@@ -3,7 +3,7 @@
 <head>
 	<title>Simple Map</title>
 	<meta name="viewport" content="initial-scale=1.0">
-	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta http-equiv="X-UA-Compatible" content="IE=11">
 	<meta charset="utf-8">
 	<style>
 		html, body {
@@ -70,12 +70,29 @@
 
 		var map, infowindow, marker;
 		var input = document.getElementById('pac-input');
+		var defLatitude = parseInt(getQueryString('latitude'));
+		var defLongitude = parseInt(getQueryString('longitude'));
 
+		function getQueryString( field, url ) {
+			var href = url ? url : window.location.href;
+			var reg = new RegExp( '[?&]' + field + '=([^&#]*)', 'i' );
+			var string = reg.exec(href);
+			return string ? string[1] : null;
+		}
+		
 		function initMap() {
 			map = new google.maps.Map(document.getElementById('map'), {
 				zoom: 5,
-				center: { lat: -34.654744, lng: -58.555602 },
+				center: { lat: defLatitude, lng: defLongitude },
+				//center: { lat: -34.654744, lng: -58.555602 },
 				mapTypeId: google.maps.MapTypeId.TERRAIN
+			});
+			
+			marker = new google.maps.Marker({
+				map: map,
+				draggable: true,
+				animation: google.maps.Animation.DROP,
+				position: map.center
 			});
 
 			infowindow = new google.maps.InfoWindow();

@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using Microsoft.Win32;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -29,7 +30,7 @@ namespace WebBrowserWithSearchBar
 		#region Private Methods
 
 		private void Form1_Load(object sender, EventArgs e)
-		{
+		{			
 			_MapPath = string.Format("{0}\\mapa.html", Directory.GetParent(Directory.GetCurrentDirectory()).Parent.FullName);
 			this.webBrowser.Navigate(_MapPath);
 		}
