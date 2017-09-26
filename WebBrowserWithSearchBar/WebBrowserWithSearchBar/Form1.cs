@@ -30,8 +30,11 @@ namespace WebBrowserWithSearchBar
 		#region Private Methods
 
 		private void Form1_Load(object sender, EventArgs e)
-		{			
-			_MapPath = string.Format("{0}\\mapa.html", Directory.GetParent(Directory.GetCurrentDirectory()).Parent.FullName);
+		{
+			_MapPath = string.Format("{0}\\mapa.html?location={1}",
+				Directory.GetParent(Directory.GetCurrentDirectory()).Parent.FullName,
+				"Santo Tomé 6141"
+				);
 			this.webBrowser.Navigate(_MapPath);
 		}
 

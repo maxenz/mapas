@@ -68,36 +68,26 @@
 	<div id="map"></div>
 	<script>
 
-		var map, infowindow, marker;
+		var map, infowindow, marker, searchBox;
 		var input = document.getElementById('pac-input');
-		var defLatitude = parseInt(getQueryString('latitude'));
-		var defLongitude = parseInt(getQueryString('longitude'));
+		var defLocation = decodeURIComponent(getQueryString('location'));
 
-		function getQueryString( field, url ) {
+		function getQueryString(field, url) {
 			var href = url ? url : window.location.href;
-			var reg = new RegExp( '[?&]' + field + '=([^&#]*)', 'i' );
+			var reg = new RegExp('[?&]' + field + '=([^&#]*)', 'i');
 			var string = reg.exec(href);
 			return string ? string[1] : null;
 		}
-		
+
 		function initMap() {
 			map = new google.maps.Map(document.getElementById('map'), {
 				zoom: 5,
-				center: { lat: defLatitude, lng: defLongitude },
-				//center: { lat: -34.654744, lng: -58.555602 },
+				center: { lat: -34.654744, lng: -58.555602 },
 				mapTypeId: google.maps.MapTypeId.TERRAIN
-			});
-			
-			marker = new google.maps.Marker({
-				map: map,
-				draggable: true,
-				animation: google.maps.Animation.DROP,
-				position: map.center
 			});
 
 			infowindow = new google.maps.InfoWindow();
-			var searchBox = new google.maps.places.SearchBox(input);
-
+			searchBox = new google.maps.places.SearchBox(input);
 			map.controls[google.maps.ControlPosition.TOP_LEFT].push(input);
 
 			map.addListener('bounds_changed', function () {
@@ -105,58 +95,69 @@
 			});
 
 			searchBox.addListener('places_changed', function () {
-				var places = searchBox.getPlaces();
+				searchPlace();
+			});
 
-				if (places.length === 0) {
+			input.value = defLocation;
+			setTimeout(
+				function () {
+					executeSearchPlace();
+				}, 500
+			);
+		}
+
+		function searchPlace() {
+			var places = searchBox.getPlaces();
+
+			if (places.length === 0) {
+				return;
+			}
+
+			if (places.length > 1) {
+				alert('Debe seleccionar un lugar mas específico.');
+			}
+
+			if (marker) {
+				marker.setMap(null);
+			}
+
+			var bounds = new google.maps.LatLngBounds();
+			places.forEach(function (place) {
+				if (!place.geometry) {
+					console.log("Returned place contains no geometry");
 					return;
 				}
 
-				if (places.length > 1) {
-					alert('Debe seleccionar un lugar mas específico.');
-				}
-
-				if (marker) {
-					marker.setMap(null);
-				}
-
-				var bounds = new google.maps.LatLngBounds();
-				places.forEach(function (place) {
-					if (!place.geometry) {
-						console.log("Returned place contains no geometry");
-						return;
-					}
-
-					marker = new google.maps.Marker({
-						map: map,
-						draggable: true,
-						animation: google.maps.Animation.DROP,
-						position: place.geometry.location,
-						address: place.formatted_address
-					});
-
-					google.maps.event.addListener(marker, 'mouseover', function () {
-						setInfoContent();
-						infowindow.open(map, this);
-					});
-
-					google.maps.event.addListener(marker, 'mouseout', function () {
-						infowindow.close();
-					});
-
-					google.maps.event.addListener(marker, 'dragend', function () {
-						infowindow.close();
-						updateMarkerPosition();
-						infowindow.open(map, this);
-					});
-
-					if (place.geometry.viewport) {
-						bounds.union(place.geometry.viewport);
-					} else {
-						bounds.extend(place.geometry.location);
-					}
+				marker = new google.maps.Marker({
+					map: map,
+					draggable: true,
+					animation: google.maps.Animation.DROP,
+					position: place.geometry.location,
+					address: place.formatted_address
 				});
-				map.fitBounds(bounds);
+
+				google.maps.event.addListener(marker, 'mouseover', function () {
+					setInfoContent();
+					infowindow.open(map, this);
+				});
+
+				google.maps.event.addListener(marker, 'mouseout', function () {
+					infowindow.close();
+				});
+
+				google.maps.event.addListener(marker, 'dragend', function () {
+					infowindow.close();
+					updateMarkerPosition();
+					infowindow.open(map, this);
+				});
+
+				if (place.geometry.viewport) {
+					bounds.union(place.geometry.viewport);
+				} else {
+					bounds.extend(place.geometry.location);
+				}
 			});
+			map.fitBounds(bounds);
 		}
 
 		function setInfoContent() {
@@ -193,6 +194,14 @@
 				}
 			});
 
+		}
+
+		function executeSearchPlace() {
+			google.maps.event.trigger(input, 'focus');
+			google.maps.event.trigger(input, 'keydown', {
+				keyCode: 13
+			});
+			input.focus();
 		}
 
 	</script>
