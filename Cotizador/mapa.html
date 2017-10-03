@@ -7,7 +7,7 @@
     <meta charset="utf-8">
     <style>
         #right-panel {
-            font-family: 'Roboto','sans-serif';
+            font-family: 'Roboto', 'sans-serif';
             line-height: 30px;
         }
 
@@ -27,7 +27,7 @@
             height: 100%;
             margin: 0;
             padding: 0;
-            overflow-y:hidden;
+            overflow-y: hidden;
         }
 
         #map {
@@ -41,9 +41,9 @@
             height: 100%;
             float: left;
             text-align: left;
-            overflow-y:auto;
+            overflow-y: auto;
         }
-        
+
         #directions-panel {
             background-color: #FFEE77;
             padding: 10px;
@@ -56,17 +56,10 @@
     <div id="directions-panel"></div>
 </div>
 <script>
-    var waypts = [
-        {location: 'Santo tome 6141, buenos aires, argentina'},
-        {location: 'Donado 1748, buenos aires, argentina'}
-    ];
-
-    function getQueryString(field, url) {
-        var href = url ? url : window.location.href;
-        var reg = new RegExp('[?&]' + field + '=([^&#]*)', 'i');
-        var string = reg.exec(href);
-        return string ? string[1] : null;
-    }
+    var routeInfo = {
+        waypts: []
+    };
+    var routeResult;
 
     function initMap() {
         var directionsService = new google.maps.DirectionsService;
@@ -76,19 +69,56 @@
             center: {lat: 41.85, lng: -87.65}
         });
         directionsDisplay.setMap(map);
+        generateRouteInformation();
         calculateAndDisplayRoute(directionsService, directionsDisplay);
+    }
+
+    function getQueryString(field, url) {
+        var href = url ? url : window.location.href;
+        var reg = new RegExp('[?&]' + field + '=([^&#]*)', 'i');
+        var string = reg.exec(href);
+        return string ? string[1] : null;
+    }
+
+    function returnTotalTime(value) {
+        var hours = Math.trunc(value / 60);
+        var minutes = value % 60;
+        return hours + 'hs.' + " " + minutes.toFixed(0) + 'min.';
+    }
+
+    function generateRouteInformation() {
+        var route = getRouteFromQueryString();
+        route.forEach(function (geopoint, idx) {
+            var point = new google.maps.LatLng(geopoint.lat, geopoint.lng);
+            if (idx === 0) {
+                routeInfo.origin = point;
+            } else if (idx === route.length - 1) {
+                routeInfo.destination = point;
+            } else {
+                routeInfo.waypts.push({
+                    location: point,
+                    stopover: true
+                });
+            }
+        });
+    }
+
+    function getRouteFromQueryString() {
+        var querystring = getQueryString('route');
+        querystring = decodeURIComponent(querystring);
+        return JSON.parse(querystring);
     }
 
     function calculateAndDisplayRoute(directionsService, directionsDisplay) {
         directionsService.route({
-            origin: 'Santo Tomé 3300, Buenos Aires, Argentina',
-            destination: 'Av. Cabildo 3600, Buenos Aires, Argentina',
-            waypoints: waypts,
+            origin: routeInfo.origin,
+            destination: routeInfo.destination,
+            waypoints: routeInfo.waypts,
             optimizeWaypoints: true,
             travelMode: 'DRIVING'
         }, function (response, status) {
             if (status === 'OK') {
-                console.log(response);
+                routeResult = response;
                 directionsDisplay.setDirections(response);
                 var route = response.routes[0];
                 var summaryPanel = document.getElementById('directions-panel');
@@ -106,12 +136,17 @@
                     totalKm += route.legs[i].distance.value / 1000;
                     totalTime += route.legs[i].duration.value / 60;
                 }
-                summaryPanel.innerHTML += '<b>Distancia total recorrida:</b> ' + totalKm.toFixed(2).replace('.', ',') + ' km. <br/>';
-                summaryPanel.innerHTML += '<b>Tiempo total aproximado:</b> ' + parseInt(totalTime) + ' min.';
+                summaryPanel.innerHTML += '<b>Distancia total recorrida:</b> ' + totalKm.toFixed(1).replace('.', ',') + ' km. <br/>';
+                summaryPanel.innerHTML += '<b>Tiempo total aproximado:</b> ' + returnTotalTime(totalTime);
             } else {
                 window.alert('Directions request failed due to ' + status);
             }
         });
+    }
+
+    // --> Se llamaría desde .NET
+    function saveRoute() {
+        return JSON.stringify(routeResult);
     }
 
 </script>
