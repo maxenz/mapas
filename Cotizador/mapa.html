@@ -1,0 +1,123 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <title>Cotizador de recorridos</title>
+    <meta name="viewport" content="initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=11">
+    <meta charset="utf-8">
+    <style>
+        #right-panel {
+            font-family: 'Roboto','sans-serif';
+            line-height: 30px;
+        }
+
+        #right-panel select, #right-panel input {
+            font-size: 15px;
+        }
+
+        #right-panel select {
+            width: 100%;
+        }
+
+        #right-panel i {
+            font-size: 12px;
+        }
+
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            overflow-y:hidden;
+        }
+
+        #map {
+            height: 100%;
+            float: left;
+            width: 70%;
+        }
+
+        #right-panel {
+            width: 30%;
+            height: 100%;
+            float: left;
+            text-align: left;
+            overflow-y:auto;
+        }
+        
+        #directions-panel {
+            background-color: #FFEE77;
+            padding: 10px;
+        }
+    </style>
+</head>
+<body>
+<div id="map"></div>
+<div id="right-panel">
+    <div id="directions-panel"></div>
+</div>
+<script>
+    var waypts = [
+        {location: 'Santo tome 6141, buenos aires, argentina'},
+        {location: 'Donado 1748, buenos aires, argentina'}
+    ];
+
+    function getQueryString(field, url) {
+        var href = url ? url : window.location.href;
+        var reg = new RegExp('[?&]' + field + '=([^&#]*)', 'i');
+        var string = reg.exec(href);
+        return string ? string[1] : null;
+    }
+
+    function initMap() {
+        var directionsService = new google.maps.DirectionsService;
+        var directionsDisplay = new google.maps.DirectionsRenderer;
+        var map = new google.maps.Map(document.getElementById('map'), {
+            zoom: 6,
+            center: {lat: 41.85, lng: -87.65}
+        });
+        directionsDisplay.setMap(map);
+        calculateAndDisplayRoute(directionsService, directionsDisplay);
+    }
+
+    function calculateAndDisplayRoute(directionsService, directionsDisplay) {
+        directionsService.route({
+            origin: 'Santo Tomé 3300, Buenos Aires, Argentina',
+            destination: 'Av. Cabildo 3600, Buenos Aires, Argentina',
+            waypoints: waypts,
+            optimizeWaypoints: true,
+            travelMode: 'DRIVING'
+        }, function (response, status) {
+            if (status === 'OK') {
+                console.log(response);
+                directionsDisplay.setDirections(response);
+                var route = response.routes[0];
+                var summaryPanel = document.getElementById('directions-panel');
+                summaryPanel.innerHTML = '';
+                var totalKm = 0;
+                var totalTime = 0;
+                for (var i = 0; i < route.legs.length; i++) {
+                    var routeSegment = i + 1;
+                    summaryPanel.innerHTML += '<b>Segmento de ruta: ' + routeSegment +
+                        '</b><br>';
+                    summaryPanel.innerHTML += route.legs[i].start_address + ' <b>a</b> ';
+                    summaryPanel.innerHTML += route.legs[i].end_address + '<br>';
+                    summaryPanel.innerHTML += '<b>Distancia:</b> ' + route.legs[i].distance.text + '<br>';
+                    summaryPanel.innerHTML += '<b>Tiempo aproximado:</b> ' + route.legs[i].duration.text + '<br><br>';
+                    totalKm += route.legs[i].distance.value / 1000;
+                    totalTime += route.legs[i].duration.value / 60;
+                }
+                summaryPanel.innerHTML += '<b>Distancia total recorrida:</b> ' + totalKm.toFixed(2).replace('.', ',') + ' km. <br/>';
+                summaryPanel.innerHTML += '<b>Tiempo total aproximado:</b> ' + parseInt(totalTime) + ' min.';
+            } else {
+                window.alert('Directions request failed due to ' + status);
+            }
+        });
+    }
+
+</script>
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAxBUmgMFEXnPYamz7RzF0N_bGVCHiLef0&libraries=places&callback=initMap"
+        async defer>
+</script>
+
+</body>
+</html>
