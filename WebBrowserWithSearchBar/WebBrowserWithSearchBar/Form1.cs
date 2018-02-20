@@ -33,7 +33,7 @@ namespace WebBrowserWithSearchBar
 		{
 			_MapPath = string.Format("{0}\\mapa.html?location={1}",
 				Directory.GetParent(Directory.GetCurrentDirectory()).Parent.FullName,
-				"Santo Tomé 6141"
+				"San Martin 2020, San Luis Capital, San Luis"
 				);
 			this.webBrowser.Navigate(_MapPath);
 		}
